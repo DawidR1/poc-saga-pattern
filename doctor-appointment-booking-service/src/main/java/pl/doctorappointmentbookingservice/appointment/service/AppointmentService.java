@@ -3,13 +3,13 @@ package pl.doctorappointmentbookingservice.appointment.service;
 
 import static pl.doctorappointmentbookingservice.appointment.statemachine.AppointmentBookingSMConf.APPOINTMENT_BOOKING_ID;
 
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
-import org.springframework.statemachine.support.StateMachineInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBooking;
@@ -62,7 +62,8 @@ public class AppointmentService {
         .build();
   }
 
-  private void resetMachineState(AppointmentBooking build, StateMachine<AppointmentBookingStatus, AppointmentBookingEvent> stateMachine) {
+  private void resetMachineState(AppointmentBooking build,
+      StateMachine<AppointmentBookingStatus, AppointmentBookingEvent> stateMachine) {
     stateMachine.stop();
     stateMachine.getStateMachineAccessor().doWithAllRegions(stateMachneAccessor -> {
       stateMachneAccessor.addStateMachineInterceptor(interceptor);
@@ -72,11 +73,50 @@ public class AppointmentService {
     stateMachine.start();
   }
 
+  @Transactional
   public void processValOfMedicalPackage(ValMedicalPackageResp response) {
     AppointmentBooking appointmentBooking = appointmentBookingRepository.findById(response.getAppointmentId()).orElseThrow();
+    if (response.isValid()) {
+      StateMachine<AppointmentBookingStatus, AppointmentBookingEvent> stateMachine
+          = stateMachineFactory.getStateMachine(appointmentBooking.getId());
+      resetMachineState(appointmentBooking, stateMachine);
 
-    if(response.isValid()) {
-//        stateMachineFactory.getStateMachine().
+      appointmentBooking.setStatus(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_APPROVED);
+
+      Message<AppointmentBookingEvent> tMessageBuilder = getPackageApprovedMessage(appointmentBooking);
+      stateMachine.sendEvent(Mono.just(tMessageBuilder))
+          .doOnError(processError(AppointmentBookingEvent.APPROVE_MEDICAL_PACKAGE))
+          .subscribe();
+
+      Message<AppointmentBookingEvent> message = getBookAppointmentMessage(appointmentBooking);
+      stateMachine.sendEvent(Mono.just(message))
+          .doOnError(processError(AppointmentBookingEvent.BOOK_APPOINTMENT))
+          .subscribe();
+
+    } else {
+      appointmentBooking.setStatus(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_REJECTED);
+
     }
+  }
+
+  private Message<AppointmentBookingEvent> getBookAppointmentMessage(AppointmentBooking appointmentBooking) {
+    return MessageBuilder
+        .withPayload(AppointmentBookingEvent.BOOK_APPOINTMENT)
+        .setHeader(APPOINTMENT_BOOKING_ID, appointmentBooking.getId().toString())
+        .build();
+  }
+
+  private Consumer<Throwable> processError(AppointmentBookingEvent valMedicalPackageApproved) {
+    return x -> {
+      System.out.println("Error, message: " + valMedicalPackageApproved);
+      System.out.println(x.getMessage());
+    };
+  }
+
+  private Message<AppointmentBookingEvent> getPackageApprovedMessage(AppointmentBooking appointmentBooking) {
+    return MessageBuilder
+        .withPayload(AppointmentBookingEvent.APPROVE_MEDICAL_PACKAGE)
+        .setHeader(APPOINTMENT_BOOKING_ID, appointmentBooking.getId().toString())
+        .build();
   }
 }

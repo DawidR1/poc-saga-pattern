@@ -14,14 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBooking;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBookingEvent;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBookingStatus;
-import pl.doctorappointmentbookingservice.appointment.dto.AppointmentBookingDto;
 import pl.doctorappointmentbookingservice.appointment.mq.QueuesConf;
-import pl.doctorappointmentbookingservice.appointment.mq.messages.ValMedicalPackageRequest;
+import pl.doctorappointmentbookingservice.appointment.mq.messages.BookAppointmentDto;
 import pl.doctorappointmentbookingservice.appointment.repository.AppointmentBookingRepository;
 
 @RequiredArgsConstructor
 @Component
-public class ValidateMedicalPackageAction implements Action<AppointmentBookingStatus, AppointmentBookingEvent> {
+public class BookAppointemntAction implements Action<AppointmentBookingStatus, AppointmentBookingEvent> {
 
   private final RabbitTemplate rabbitTemplate;
   private final AppointmentBookingRepository appointmentBookingRepository;
@@ -32,12 +31,12 @@ public class ValidateMedicalPackageAction implements Action<AppointmentBookingSt
   public void execute(StateContext<AppointmentBookingStatus, AppointmentBookingEvent> context) {
     String id = (String) context.getMessage().getHeaders().get(APPOINTMENT_BOOKING_ID);
     AppointmentBooking appointmentBooking = appointmentBookingRepository.findById(UUID.fromString(id)).orElseThrow();
-    appointmentBooking.setStatus(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_PENDING);
-    String req = ValMedicalPackageRequest.toDto(appointmentBooking);
+
+    String req = BookAppointmentDto.toJson(appointmentBooking);
     rabbitTemplate.convertAndSend(
         QueuesConf.APPOINTMENT_BOOKING_EXCHANGE,
-        QueuesConf.K_VAL_MEDICAL_PACKAGE,
+        QueuesConf.BOOK_APPOINTMENT_KEY,
         req);
-    System.out.println("appointment-booking-service, Validate medical package producer: " + req);
+    System.out.println("appointment-booking-service, Book appointment producer: " + req);
   }
 }

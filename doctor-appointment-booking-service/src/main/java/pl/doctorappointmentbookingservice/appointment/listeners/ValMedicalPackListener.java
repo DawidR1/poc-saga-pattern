@@ -1,6 +1,8 @@
 package pl.doctorappointmentbookingservice.appointment.listeners;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -15,7 +17,10 @@ class ValMedicalPackListener {
   private final AppointmentService appointmentService;
 
   @RabbitListener(queues = QueuesConf.VALIDATE_MEDICAL_PACKAGE_RESP_QUEUE)
-  void validate(ValMedicalPackageResp response) {
-   appointmentService.processValOfMedicalPackage(response);
+  void validate(String response) throws JsonProcessingException {
+    ValMedicalPackageResp valMedicalPackageResp = new ObjectMapper().readValue(response, ValMedicalPackageResp.class);
+    System.out.println("appointment-booking-service, Validate medical package resp consumer: " + response);
+
+    appointmentService.processValOfMedicalPackage(valMedicalPackageResp);
   }
 }

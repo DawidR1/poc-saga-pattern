@@ -4,13 +4,13 @@ package pl.doctorappointmentbookingservice.appointment.statemachine;
 import java.util.EnumSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBookingEvent;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBookingStatus;
+import pl.doctorappointmentbookingservice.appointment.statemachine.actions.BookAppointemntAction;
 import pl.doctorappointmentbookingservice.appointment.statemachine.actions.ValidateMedicalPackageAction;
 
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class AppointmentBookingSMConf extends StateMachineConfigurerAdapter<Appo
   public static final String APPOINTMENT_BOOKING_ID = "APPOINTMENT_BOOKING_ID";
   private final ValidateMedicalPackageAction validateMedicalPackageAction;
   private final ValidationApprovedAction validationApprovedAction;
+  private final BookAppointemntAction bookAppointemntAction;
 
 
   @Override
@@ -45,8 +46,14 @@ public class AppointmentBookingSMConf extends StateMachineConfigurerAdapter<Appo
         .and()
         .withExternal()
         .source(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_PENDING)
-        .target(AppointmentBookingStatus.APPOINTMENT_APPROVED)
-        .event(AppointmentBookingEvent.VAL_MEDICAL_PACKAGE_APPROVED);
-//        .action(validationApprovedAction)
+        .target(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_APPROVED)
+        .event(AppointmentBookingEvent.APPROVE_MEDICAL_PACKAGE)
+
+        .and()
+        .withExternal()
+        .source(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_APPROVED)
+        .target(AppointmentBookingStatus.APPOINTMENT_BOOKING_PENDING)
+        .event(AppointmentBookingEvent.BOOK_APPOINTMENT)
+        .action(bookAppointemntAction);
   }
 }
