@@ -12,7 +12,7 @@ import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBooking;
 
 @Value
 @Builder
-public class BookAppointmentDto implements Serializable {
+public class BookAppointmentReqDto implements Serializable {
 
   UUID patientId;
   UUID doctorId;
@@ -22,7 +22,7 @@ public class BookAppointmentDto implements Serializable {
 
 
   public static String toJson(AppointmentBooking appointmentBooking) throws JsonProcessingException {
-    BookAppointmentDto dto = BookAppointmentDto.builder()
+    BookAppointmentReqDto dto = BookAppointmentReqDto.builder()
         .appointmentId(appointmentBooking.getId())
         .fromDate(appointmentBooking.getFromDate())
         .doctorId(appointmentBooking.getDoctorId())

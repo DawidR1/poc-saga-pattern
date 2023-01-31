@@ -15,7 +15,7 @@ import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBooking;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBookingEvent;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBookingStatus;
 import pl.doctorappointmentbookingservice.appointment.mq.QueuesConf;
-import pl.doctorappointmentbookingservice.appointment.mq.messages.BookAppointmentDto;
+import pl.doctorappointmentbookingservice.appointment.mq.messages.BookAppointmentReqDto;
 import pl.doctorappointmentbookingservice.appointment.repository.AppointmentBookingRepository;
 
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class BookAppointemntAction implements Action<AppointmentBookingStatus, A
     String id = (String) context.getMessage().getHeaders().get(APPOINTMENT_BOOKING_ID);
     AppointmentBooking appointmentBooking = appointmentBookingRepository.findById(UUID.fromString(id)).orElseThrow();
 
-    String req = BookAppointmentDto.toJson(appointmentBooking);
+    String req = BookAppointmentReqDto.toJson(appointmentBooking);
     rabbitTemplate.convertAndSend(
         QueuesConf.APPOINTMENT_BOOKING_EXCHANGE,
         QueuesConf.BOOK_APPOINTMENT_KEY,

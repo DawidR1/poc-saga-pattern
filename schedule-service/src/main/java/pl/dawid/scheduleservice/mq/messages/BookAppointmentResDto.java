@@ -1,25 +1,24 @@
-package pl.doctorappointmentbookingservice.appointment.dto;
+package pl.dawid.scheduleservice.mq.messages;
 
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBooking;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
-public class AppointmentBookingDto {
+public class BookAppointmentResDto implements Serializable {
 
   private UUID patientId;
   private UUID doctorId;
-  private LocalDate from;
-  private LocalDate to;
+  private UUID appointmentId;
+  private LocalDate fromDate;
+  private LocalDate toDate;
 
 }

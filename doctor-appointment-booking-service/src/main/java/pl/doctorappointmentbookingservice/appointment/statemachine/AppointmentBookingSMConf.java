@@ -20,7 +20,6 @@ public class AppointmentBookingSMConf extends StateMachineConfigurerAdapter<Appo
 
   public static final String APPOINTMENT_BOOKING_ID = "APPOINTMENT_BOOKING_ID";
   private final ValidateMedicalPackageAction validateMedicalPackageAction;
-  private final ValidationApprovedAction validationApprovedAction;
   private final BookAppointemntAction bookAppointemntAction;
 
 
@@ -54,6 +53,12 @@ public class AppointmentBookingSMConf extends StateMachineConfigurerAdapter<Appo
         .source(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_APPROVED)
         .target(AppointmentBookingStatus.APPOINTMENT_BOOKING_PENDING)
         .event(AppointmentBookingEvent.BOOK_APPOINTMENT)
-        .action(bookAppointemntAction);
+        .action(bookAppointemntAction)
+
+        .and()
+        .withExternal()
+        .source(AppointmentBookingStatus.APPOINTMENT_BOOKING_PENDING)
+        .target(AppointmentBookingStatus.APPOINTMENT_APPROVED)
+        .event(AppointmentBookingEvent.APPROVE_APPOINTMENT);
   }
 }
