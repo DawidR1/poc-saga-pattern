@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import pl.dawid.medicalpackageservice.listeners.dto.ValMedicalPackageReq;
+import pl.dawid.medicalpackageservice.mq.messages.ValMedicalPackageReq;
 import pl.dawid.medicalpackageservice.service.MedicalPackValiService;
 
 @Component

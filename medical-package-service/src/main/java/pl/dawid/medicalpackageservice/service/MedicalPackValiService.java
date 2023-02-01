@@ -9,8 +9,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-import pl.dawid.medicalpackageservice.listeners.dto.ValMedicalPackageResult;
-import pl.dawid.medicalpackageservice.listeners.dto.ValMedicalPackageReq;
+import pl.dawid.medicalpackageservice.mq.messages.ValMedicalPackageResult;
+import pl.dawid.medicalpackageservice.mq.messages.ValMedicalPackageReq;
 import pl.dawid.medicalpackageservice.mq.QueueConf;
 
 @Service

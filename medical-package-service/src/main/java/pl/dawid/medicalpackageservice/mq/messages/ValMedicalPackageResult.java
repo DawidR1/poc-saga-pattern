@@ -1,4 +1,4 @@
-package pl.dawid.medicalpackageservice.listeners.dto;
+package pl.dawid.medicalpackageservice.mq.messages;
 
 
 import java.io.Serializable;
