@@ -14,22 +14,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookAppointmentReqDto implements Serializable {
+public class BookAppointmentResult implements Serializable {
 
   private UUID appointmentId;
   private boolean booked;
   private String reason;
 
-  public static BookAppointmentReqDto toBookingRejected(UUID appointmentId, String reason) {
-    return BookAppointmentReqDto.builder()
+  public static BookAppointmentResult toBookingRejected(UUID appointmentId, String reason) {
+    return BookAppointmentResult.builder()
         .appointmentId(appointmentId)
         .reason(reason)
         .booked(false)
         .build();
   }
 
-  public static BookAppointmentReqDto toBookingAccepted(UUID appointmentId) throws JsonProcessingException {
-    return BookAppointmentReqDto.builder()
+  public static BookAppointmentResult toBookingAccepted(UUID appointmentId) throws JsonProcessingException {
+    return BookAppointmentResult.builder()
         .appointmentId(appointmentId)
         .booked(true)
         .build();

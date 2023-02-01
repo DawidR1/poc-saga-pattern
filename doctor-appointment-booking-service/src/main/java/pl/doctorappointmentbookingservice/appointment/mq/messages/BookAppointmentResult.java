@@ -4,14 +4,18 @@ package pl.doctorappointmentbookingservice.appointment.mq.messages;
 import java.io.Serializable;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValMedicalPackageResp implements Serializable {
+@Builder
+public class BookAppointmentResult implements Serializable {
 
-  boolean valid;
-  UUID appointmentId;
+  private UUID appointmentId;
+  private boolean booked;
+  private String reason;
+
 }

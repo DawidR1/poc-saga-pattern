@@ -1,4 +1,4 @@
-package pl.doctorappointmentbookingservice.appointment.mq.messages;
+package pl.dawid.medicalpackageservice.listeners.dto;
 
 
 import java.io.Serializable;
@@ -12,10 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookAppointmentResDto implements Serializable {
+public class ValMedicalPackageResult implements Serializable {
 
-  private UUID appointmentId;
-  private boolean booked;
-  private String reason;
+  boolean valid;
+  UUID appointmentId;
 
 }

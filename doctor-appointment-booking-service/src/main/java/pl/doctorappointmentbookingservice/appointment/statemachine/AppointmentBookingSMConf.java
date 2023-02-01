@@ -22,7 +22,6 @@ public class AppointmentBookingSMConf extends StateMachineConfigurerAdapter<Appo
   private final ValidateMedicalPackageAction validateMedicalPackageAction;
   private final BookAppointemntAction bookAppointemntAction;
 
-
   @Override
   public void configure(StateMachineStateConfigurer<AppointmentBookingStatus, AppointmentBookingEvent> states) throws Exception {
     states.withStates()
@@ -50,6 +49,12 @@ public class AppointmentBookingSMConf extends StateMachineConfigurerAdapter<Appo
 
         .and()
         .withExternal()
+        .source(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_PENDING)
+        .target(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_REJECTED)
+        .event(AppointmentBookingEvent.REJECT_MEDICAL_PACKAGE)
+
+        .and()
+        .withExternal()
         .source(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_APPROVED)
         .target(AppointmentBookingStatus.APPOINTMENT_BOOKING_PENDING)
         .event(AppointmentBookingEvent.BOOK_APPOINTMENT)
@@ -59,6 +64,13 @@ public class AppointmentBookingSMConf extends StateMachineConfigurerAdapter<Appo
         .withExternal()
         .source(AppointmentBookingStatus.APPOINTMENT_BOOKING_PENDING)
         .target(AppointmentBookingStatus.APPOINTMENT_APPROVED)
-        .event(AppointmentBookingEvent.APPROVE_APPOINTMENT);
+        .event(AppointmentBookingEvent.APPROVE_APPOINTMENT)
+
+        .and()
+        .withExternal()
+        .source(AppointmentBookingStatus.APPOINTMENT_BOOKING_PENDING)
+        .target(AppointmentBookingStatus.APPOINTMENT_REJECTED)
+        .event(AppointmentBookingEvent.REJECT_APPOINTMENT);
+
   }
 }

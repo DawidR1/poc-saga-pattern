@@ -6,6 +6,7 @@ import static pl.doctorappointmentbookingservice.appointment.statemachine.Appoin
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.action.Action;
@@ -14,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBooking;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBookingEvent;
 import pl.doctorappointmentbookingservice.appointment.domain.AppointmentBookingStatus;
-import pl.doctorappointmentbookingservice.appointment.dto.AppointmentBookingDto;
-import pl.doctorappointmentbookingservice.appointment.mq.QueuesConf;
+import pl.doctorappointmentbookingservice.appointment.mq.QueueConf;
 import pl.doctorappointmentbookingservice.appointment.mq.messages.ValMedicalPackageRequest;
 import pl.doctorappointmentbookingservice.appointment.repository.AppointmentBookingRepository;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class ValidateMedicalPackageAction implements Action<AppointmentBookingStatus, AppointmentBookingEvent> {
 
   private final RabbitTemplate rabbitTemplate;
@@ -32,12 +33,11 @@ public class ValidateMedicalPackageAction implements Action<AppointmentBookingSt
   public void execute(StateContext<AppointmentBookingStatus, AppointmentBookingEvent> context) {
     String id = (String) context.getMessage().getHeaders().get(APPOINTMENT_BOOKING_ID);
     AppointmentBooking appointmentBooking = appointmentBookingRepository.findById(UUID.fromString(id)).orElseThrow();
-    appointmentBooking.setStatus(AppointmentBookingStatus.VAL_MEDICAL_PACKAGE_PENDING);
     String req = ValMedicalPackageRequest.toDto(appointmentBooking);
     rabbitTemplate.convertAndSend(
-        QueuesConf.APPOINTMENT_BOOKING_EXCHANGE,
-        QueuesConf.K_VAL_MEDICAL_PACKAGE,
+        QueueConf.APPOINTMENT_BOOKING_EXCHANGE,
+        QueueConf.K_VAL_MEDICAL_PACKAGE,
         req);
-    System.out.println("appointment-booking-service, Validate medical package producer: " + req);
+    log.info("Service: appointment-booking-service; validate medical package; producer ; " + req);
   }
 }

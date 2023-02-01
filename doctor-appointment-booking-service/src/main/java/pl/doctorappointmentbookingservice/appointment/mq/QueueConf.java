@@ -5,12 +5,14 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class QueuesConf {
+public class QueueConf {
 
   public static final String VALIDATE_MEDICAL_PACKAGE_QUEUE = "q.validate-medical-package-queue";
   public static final String VALIDATE_MEDICAL_PACKAGE_RESP_QUEUE = "q.validate-medical-package-resp-queue";
